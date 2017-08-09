@@ -6,7 +6,13 @@ class Site {
     private $content;
 
     function __construct($c) {
-        $content = $c;
+        $this->content = $c;
+    }
+
+    function showHeader() {
+        if (($title = $this->content->getTitle()) != NULL) {
+            echo $title;
+        }
     }
 
     function show() {
