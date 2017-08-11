@@ -3,12 +3,9 @@
 <?php
     $this->showHeader();
 ?>
-<head>
-    <title>Flower catalog</title>
-</head>
 <body>
 <?php
     
 ?>
-<body>
+</body>
 </html>

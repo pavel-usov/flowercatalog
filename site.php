@@ -1,6 +1,7 @@
 <?php
 
 include 'config.php';
+include 'elements.php';
 
 class Site {
     private $content;
@@ -10,9 +11,9 @@ class Site {
     }
 
     function showHeader() {
-        if (($title = $this->content->getTitle()) != NULL) {
-            echo $title;
-        }
+        $header = new Header();
+        $header->addTitle($this->content->getTitle());
+        $header->show();
     }
 
     function show() {

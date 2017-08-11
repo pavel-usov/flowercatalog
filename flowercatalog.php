@@ -4,7 +4,7 @@ class FlowerCatalog {
     }
 
     function getTitle() {
-        return NULL;
+        return "Flower catalog";
     }
 }
 ?>
