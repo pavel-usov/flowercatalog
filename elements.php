@@ -9,7 +9,7 @@ class Element {
         $this->content = "";
     }
 
-    function show() {
+    function render() {
         return "<".$this->name.">".$this->content."<".$this->name."/>";
     }
 }
@@ -18,27 +18,44 @@ class BlockElement extends Element {
     protected $level;
 
     function __construct() {
-        $this->level = 0;
-        $this->content = NULL;
+        $this->level = "";
+    }
+
+    function incLevel() {
+        $this->level .= "    "; 
+    }
+
+    function render() {
+        return $this->level.parent::render()."\n";
     }
 }
 
-class Header extends BlockElement {
+class Block extends BlockElement {
+    function __construct() {
+        $this->content = NULL;
+    }
+
+    function addElement($b) {
+        $b->incLevel();
+        $this->content = $b;
+    }
+
+    function render() {     
+        $this->content == NULL ? $c = "" : $c = $this->content->render();
+        return "<".$this->name.">\n".$c."</".$this->name.">\n";
+    }
+}
+
+class Header extends Block {
     function __construct() {
         $this->name = "head";
     }
 
     function addTitle($t) {
-        $title = new Element;
+        $title = new BlockElement;
         $title->name = "title";
         $title->content = $t;
-        $this->content = $title;
-    }
-
-    function show() {
-        echo "<".$this->name.">\n";
-        echo "    ".$this->content->show()."\n";
-        echo "</".$this->name.">\n";
+        $this->addElement($title);
     }
 }
 ?>

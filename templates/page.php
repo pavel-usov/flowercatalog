@@ -2,10 +2,6 @@
 <html>
 <?php
     $this->showHeader();
+    $this->showBody();
 ?>
-<body>
-<?php
-    
-?>
-</body>
 </html>
