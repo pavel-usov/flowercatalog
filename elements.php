@@ -15,7 +15,9 @@ class Element {
 }
 
 class BlockElement extends Element {
-    protected $level;
+    protected
+        $level,
+        $nextElement;
 
     function __construct() {
         $this->level = "";
@@ -31,18 +33,35 @@ class BlockElement extends Element {
 }
 
 class Block extends BlockElement {
+    private
+        $elements,
+        $curElement;
+
     function __construct() {
+        $this->elements = NULL;
+        $this->nextElement = NULL;
         $this->content = NULL;
     }
 
     function addElement($b) {
         $b->incLevel();
-        $this->content = $b;
+        if ($this->elements == NULL) {
+            $this->elements = $b;
+            $this->curElement = $b;
+            return;
+        }
+        $this->curElement->nextElement = $b;
+        $this->curElement = $b;
     }
 
-    function render() {     
-        $this->content == NULL ? $c = "" : $c = $this->content->render();
-        return "<".$this->name.">\n".$c."</".$this->name.">\n";
+    function render() {
+        $txt = "";
+        $e = $this->elements;
+        while ($e != NULL) {
+            $txt .= $e->render();
+            $e = $e->nextElement;
+        }
+        return "<".$this->name.">\n".$txt."</".$this->name.">\n";
     }
 }
 

@@ -6,31 +6,33 @@ include 'elements.php';
 class Site {
     private
         $content,
-        $html;
+        $page;
 
     function __construct($c) {
         $this->content = $c;
-#        $this->html = new Block();
-#        $this->html->name = "html";
+        $this->page = new Block();
+        $this->page->name = "html";
     }
 
-    function showHeader() {
+    function addHeader() {
         $header = new Header();
         $header->addTitle($this->content->getTitle());
-        echo $header->render();
+        $this->page->addElement($header);
+#        echo $header->render();
     }
 
-    function showBody() {
+    function addBody() {
         $body = new Block();
         $body->name = "body";
-        echo $body->render();
+        $this->page->addElement($body);
+#        echo $body->render();
     }
 
     function show() {
         global $config;
 
-#        echo $this->html->render();
         include $config['template_path']."/page.php";
+        echo $this->page->render();
     }
 }
 ?>

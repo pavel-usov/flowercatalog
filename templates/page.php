@@ -1,7 +1,5 @@
 <!doctype html>
-<html>
 <?php
-    $this->showHeader();
-    $this->showBody();
+    $this->addHeader();
+    $this->addBody();
 ?>
-</html>
