@@ -3,35 +3,41 @@
 include 'config.php';
 include 'elements.php';
 
+class OUTPUT {
+    const HTML = 1;
+}
+
 class Site {
     private
         $content,
         $page;
 
-    function __construct($c) {
+    function __construct($c, $type) {
         $this->content = $c;
-        $this->page = new Block();
-        $this->page->name = "html";
+        if ($type == OUTPUT::HTML) {
+            $this->page = new Block();
+            $this->page->name = "html";
+        }
     }
 
     function addHeader() {
-        $header = new Header();
+        $header = new PageHeader();
         $header->addTitle($this->content->getTitle());
         $this->page->addElement($header);
-#        echo $header->render();
+        return $header;
     }
 
     function addBody() {
         $body = new Block();
         $body->name = "body";
         $this->page->addElement($body);
-#        echo $body->render();
+        return $body;
     }
 
-    function show() {
+    function show($Page) {
         global $config;
 
-        include $config['template_path']."/page.php";
+        include $config['template_path']."/".$Page->template;
         echo $this->page->render();
     }
 }

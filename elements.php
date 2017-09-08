@@ -10,25 +10,25 @@ class Element {
     }
 
     function render() {
-        return "<".$this->name.">".$this->content."<".$this->name."/>";
+        return "<".$this->name.">".$this->content."</".$this->name.">";
     }
 }
 
 class BlockElement extends Element {
     protected
-        $level,
+        $indent,
         $nextElement;
 
     function __construct() {
-        $this->level = "";
+        $this->indent = "";
     }
 
-    function incLevel() {
-        $this->level .= "    "; 
+    function incIndent() {
+        $this->indent .= "    ";
     }
 
     function render() {
-        return $this->level.parent::render()."\n";
+        return $this->indent.parent::render()."\n";
     }
 }
 
@@ -40,11 +40,9 @@ class Block extends BlockElement {
     function __construct() {
         $this->elements = NULL;
         $this->nextElement = NULL;
-        $this->content = NULL;
     }
 
     function addElement($b) {
-        $b->incLevel();
         if ($this->elements == NULL) {
             $this->elements = $b;
             $this->curElement = $b;
@@ -58,14 +56,16 @@ class Block extends BlockElement {
         $txt = "";
         $e = $this->elements;
         while ($e != NULL) {
+            $e->indent = $this->indent;
+            $e->incIndent();
             $txt .= $e->render();
             $e = $e->nextElement;
         }
-        return "<".$this->name.">\n".$txt."</".$this->name.">\n";
+        return $this->indent."<".$this->name.">\n".$txt.$this->indent."</".$this->name.">\n";
     }
 }
 
-class Header extends Block {
+class PageHeader extends Block {
     function __construct() {
         $this->name = "head";
     }
@@ -75,6 +75,33 @@ class Header extends Block {
         $title->name = "title";
         $title->content = $t;
         $this->addElement($title);
+    }
+}
+
+class Header extends Block {
+    protected
+        $level;
+    
+    function __construct($t) {
+        $this->level = 1;
+        $this->name = "h1";
+        $this->content = $t;
+    }
+
+    function render() {
+        return BlockElement::render();
+    }
+
+    function addElement($b) {
+        $b->level = $this->level++;
+        $b->name = "h".$this->level;
+        parent::addElement($b);
+    }
+}
+
+class TblOfContent extends Header {
+    function __construct() {
+        $this->level = 0;
     }
 }
 ?>

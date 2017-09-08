@@ -3,7 +3,8 @@ include 'site.php';
 include 'flowercatalog.php';
 
 $content = new FlowerCatalog();
-$site = new Site($content);
+$site = new Site($content, OUTPUT::HTML);
 
-$site->show(); 
+$page = new MainPage();
+$site->show($page); 
 ?>
