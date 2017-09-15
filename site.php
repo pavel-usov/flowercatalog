@@ -20,14 +20,14 @@ class Site {
         }
     }
 
-    function addHeader() {
+    function addPageHeader() {
         $header = new PageHeader();
         $header->addTitle($this->content->getTitle());
         $this->page->addElement($header);
         return $header;
     }
 
-    function addBody() {
+    function addPageBody() {
         $body = new Block();
         $body->name = "body";
         $this->page->addElement($body);

@@ -82,10 +82,11 @@ class Header extends Block {
     protected
         $level;
     
-    function __construct($t) {
+    function __construct($t, $p = NULL) {
         $this->level = 1;
         $this->name = "h1";
         $this->content = $t;
+        if ($p != NULL) $p->addElement($this);
     }
 
     function render() {
@@ -102,6 +103,12 @@ class Header extends Block {
 class TblOfContent extends Header {
     function __construct() {
         $this->level = 0;
+    }
+}
+
+class BlockGroup extends Block {
+    function __construct() {
+        $this->name = "div";
     }
 }
 ?>
