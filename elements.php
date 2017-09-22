@@ -1,7 +1,15 @@
 <?php
-class Element {
+class SimpleElement {
     public
-        $name,
+        $name;
+
+    function render() {
+        return "<".$this->name.">";
+    }
+}
+
+class Element extends SimpleElement {
+    public
         $content;
 
     function __construct() {
@@ -10,7 +18,7 @@ class Element {
     }
 
     function render() {
-        return "<".$this->name.">".$this->content."</".$this->name.">";
+        return parent::render().$this->content."</".$this->name.">";
     }
 }
 
@@ -61,7 +69,7 @@ class Block extends BlockElement {
             $txt .= $e->render();
             $e = $e->nextElement;
         }
-        return $this->indent."<".$this->name.">\n".$txt.$this->indent."</".$this->name.">\n";
+        return $this->indent.SimpleElement::render()."\n".$txt.$this->indent."</".$this->name.">\n";
     }
 }
 
