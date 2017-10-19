@@ -14,7 +14,7 @@ class Element extends SimpleElement {
 
     function __construct() {
         $this->name = "";
-        $this->content = "";
+        $this->content = NULL;
     }
 
     function render() {
@@ -22,13 +22,16 @@ class Element extends SimpleElement {
     }
 }
 
-class BlockElement extends Element {
+class BlockElement {
     protected
-        $indent,
+        $indent;
+    public
+        $element,
         $nextElement;
 
     function __construct() {
         $this->indent = "";
+        $this->element = NULL;
     }
 
     function incIndent() {
@@ -36,11 +39,12 @@ class BlockElement extends Element {
     }
 
     function render() {
-        return $this->indent.parent::render()."\n";
+        $txt = str_replace("\n", "\n".$this->indent, $this->element->render());
+        return $this->indent.$txt."\n";
     }
 }
 
-class Block extends BlockElement {
+class Block extends Element {
     private
         $elements,
         $curElement;
@@ -51,25 +55,26 @@ class Block extends BlockElement {
     }
 
     function addElement($b) {
+        $e = new BlockElement();
+        $e->element = $b;
         if ($this->elements == NULL) {
-            $this->elements = $b;
-            $this->curElement = $b;
+            $this->elements = $e;
+            $this->curElement = $e;
             return;
         }
-        $this->curElement->nextElement = $b;
-        $this->curElement = $b;
+        $this->curElement->nextElement = $e;
+        $this->curElement = $e;
     }
 
     function render() {
         $txt = "";
         $e = $this->elements;
         while ($e != NULL) {
-            $e->indent = $this->indent;
             $e->incIndent();
             $txt .= $e->render();
             $e = $e->nextElement;
         }
-        return $this->indent.SimpleElement::render()."\n".$txt.$this->indent."</".$this->name.">\n";
+        return SimpleElement::render()."\n".$txt."</".$this->name.">";
     }
 }
 
@@ -79,7 +84,7 @@ class PageHeader extends Block {
     }
 
     function addTitle($t) {
-        $title = new BlockElement;
+        $title = new Element;
         $title->name = "title";
         $title->content = $t;
         $this->addElement($title);
@@ -98,7 +103,7 @@ class Header extends Block {
     }
 
     function render() {
-        return BlockElement::render();
+        return Element::render();
     }
 
     function addElement($b) {
