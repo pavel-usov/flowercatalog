@@ -1,21 +1,33 @@
 <?php
 class SimpleElement {
+    protected
+        $options = array();
     public
         $name;
 
+    function __construct ($n = "") {
+        $this->name = $n;
+    }
+
+    function setOption($o, $v = NULL) {
+        $this->options[$o] = $v;
+    }
+
     function render() {
-        return "<".$this->name.">";
+        $opts = "";
+        foreach (array_keys($this->options) as $o) {
+            $opts .= " ".$o;
+            if ($this->options[$o] != NULL) {
+                $opts .= "=\"".$this->options[$o]."\"";
+            }            
+        }
+        return "<".$this->name.$opts.">";
     }
 }
 
 class Element extends SimpleElement {
     public
-        $content;
-
-    function __construct() {
-        $this->name = "";
-        $this->content = NULL;
-    }
+        $content = NULL;
 
     function render() {
         return parent::render().$this->content."</".$this->name.">";
@@ -24,15 +36,10 @@ class Element extends SimpleElement {
 
 class BlockElement {
     protected
-        $indent;
+        $indent = "";
     public
-        $element,
-        $nextElement;
-
-    function __construct() {
-        $this->indent = "";
-        $this->element = NULL;
-    }
+        $element = NULL,
+        $nextElement = NULL;
 
     function incIndent() {
         $this->indent .= "    ";
@@ -46,13 +53,8 @@ class BlockElement {
 
 class Block extends Element {
     private
-        $elements,
-        $curElement;
-
-    function __construct() {
-        $this->elements = NULL;
-        $this->nextElement = NULL;
-    }
+        $elements = NULL,
+        $curElement = NULL;
 
     function addElement($b) {
         $e = new BlockElement();
@@ -84,8 +86,8 @@ class PageHeader extends Block {
     }
 
     function addTitle($t) {
-        $title = new Element;
-        $title->name = "title";
+        $title = new Element("title");
+#        $title->name = "title";
         $title->content = $t;
         $this->addElement($title);
     }
@@ -122,6 +124,15 @@ class TblOfContent extends Header {
 class BlockGroup extends Block {
     function __construct() {
         $this->name = "div";
+    }
+}
+
+class Image extends SimpleElement {
+    function __construct($i = NULL) {
+        $this->name = "img";
+        if ($i != NULL) {
+            $this->setOption("src", $i);
+        }
     }
 }
 ?>

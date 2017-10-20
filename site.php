@@ -15,8 +15,7 @@ class Site {
     function __construct($c, $type) {
         $this->content = $c;
         if ($type == OUTPUT::HTML) {
-            $this->page = new Block();
-            $this->page->name = "html";
+            $this->page = new Block("html");
         }
     }
 
@@ -28,8 +27,7 @@ class Site {
     }
 
     function addPageBody() {
-        $body = new Block();
-        $body->name = "body";
+        $body = new Block("body");
         $this->page->addElement($body);
         return $body;
     }

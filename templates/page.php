@@ -11,4 +11,7 @@
     $g->addElement($sh);
 
     $body->addElement($g);
+
+    $i = new Image("jasmin.jpg");
+    $body->addElement($i);
 ?>
