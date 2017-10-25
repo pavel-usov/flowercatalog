@@ -87,7 +87,6 @@ class PageHeader extends Block {
 
     function addTitle($t) {
         $title = new Element("title");
-#        $title->name = "title";
         $title->content = $t;
         $this->addElement($title);
     }
@@ -97,21 +96,22 @@ class Header extends Block {
     protected
         $level;
     
-    function __construct($t, $p = NULL) {
+    function __construct($t) {
         $this->level = 1;
         $this->name = "h1";
         $this->content = $t;
-        if ($p != NULL) $p->addElement($this);
     }
 
     function render() {
         return Element::render();
     }
 
-    function addElement($b) {
-        $b->level = $this->level++;
+    function newHeader($t) {
+        $b = new Header($t);
+        $b->level = $this->level + 1;
         $b->name = "h".$this->level;
         parent::addElement($b);
+        return $b;
     }
 }
 
@@ -133,6 +133,37 @@ class Image extends SimpleElement {
         if ($i != NULL) {
             $this->setOption("src", $i);
         }
+    }
+}
+
+class Text {
+    public
+        $plainText,
+        $lineLen = 80;
+
+    protected
+        $content;
+
+    function __construct($t) {
+        $this->plainText = $t;
+    }
+
+    function prepareContent() {
+        $search_list = array("<", ">");
+        $replace_list = array("&lt;", "&gt;");
+        $this->content = str_replace($search_list, $replace_list, $this->plainText);
+    }
+
+    function mdFormat() {
+        $search_list = array("/\*(.*?)\*/");
+        $replace_list = array("<em>$1</em>");
+        $this->content = preg_replace($search_list, $replace_list, $this->content);
+    }
+
+    function render() {
+        $this->prepareContent();
+        $this->mdFormat();
+        return wordwrap($this->content, $this->lineLen, "\n" );
     }
 }
 ?>

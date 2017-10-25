@@ -9,10 +9,8 @@ class FlowerCatalog {
 }
 
 class MainPage {
-    private
-        $tblOfContent;
-
     public
+        $tblOfContent,
         $template;
 
     function __construct() {
