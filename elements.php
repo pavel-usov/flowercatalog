@@ -5,7 +5,7 @@ class SimpleElement {
     public
         $name;
 
-    function __construct ($n = "") {
+    function __construct ($n = '') {
         $this->name = $n;
     }
 
@@ -14,14 +14,14 @@ class SimpleElement {
     }
 
     function render() {
-        $opts = "";
+        $opts = '';
         foreach (array_keys($this->options) as $o) {
-            $opts .= " ".$o;
+            $opts .= ' '.$o;
             if ($this->options[$o] != NULL) {
-                $opts .= "=\"".$this->options[$o]."\"";
+                $opts .= '="'.$this->options[$o].'"';
             }            
         }
-        return "<".$this->name.$opts.">";
+        return '<'.$this->name.$opts.'>';
     }
 }
 
@@ -30,19 +30,19 @@ class Element extends SimpleElement {
         $content = NULL;
 
     function render() {
-        return parent::render().$this->content."</".$this->name.">";
+        return parent::render().$this->content.'</'.$this->name.'>';
     }
 }
 
 class BlockElement {
     protected
-        $indent = "";
+        $indent = '';
     public
         $element = NULL,
         $nextElement = NULL;
 
     function incIndent() {
-        $this->indent .= "    ";
+        $this->indent .= '    ';
     }
 
     function render() {
@@ -69,24 +69,24 @@ class Block extends Element {
     }
 
     function render() {
-        $txt = "";
+        $txt = '';
         $e = $this->elements;
         while ($e != NULL) {
             $e->incIndent();
             $txt .= $e->render();
             $e = $e->nextElement;
         }
-        return SimpleElement::render()."\n".$txt."</".$this->name.">";
+        return SimpleElement::render()."\n".$txt.'</'.$this->name.'>';
     }
 }
 
 class PageHeader extends Block {
     function __construct() {
-        $this->name = "head";
+        $this->name = 'head';
     }
 
     function addTitle($t) {
-        $title = new Element("title");
+        $title = new Element('title');
         $title->content = $t;
         $this->addElement($title);
     }
@@ -98,8 +98,13 @@ class Header extends Block {
     
     function __construct($t) {
         $this->level = 1;
-        $this->name = "h1";
+        $this->name = 'h1';
         $this->content = $t;
+    }
+
+    function setLevel($l) {
+        $this->level = $l;
+        $this->name = 'h'.$l;
     }
 
     function render() {
@@ -108,8 +113,7 @@ class Header extends Block {
 
     function newHeader($t) {
         $b = new Header($t);
-        $b->level = $this->level + 1;
-        $b->name = "h".$this->level;
+        $b->setLevel($this->level + 1);
         parent::addElement($b);
         return $b;
     }
@@ -123,15 +127,15 @@ class TblOfContent extends Header {
 
 class BlockGroup extends Block {
     function __construct() {
-        $this->name = "div";
+        $this->name = 'div';
     }
 }
 
 class Image extends SimpleElement {
     function __construct($i = NULL) {
-        $this->name = "img";
+        $this->name = 'img';
         if ($i != NULL) {
-            $this->setOption("src", $i);
+            $this->setOption('src', $i);
         }
     }
 }
@@ -149,14 +153,30 @@ class Text {
     }
 
     function prepareContent() {
-        $search_list = array("<", ">");
-        $replace_list = array("&lt;", "&gt;");
+        $search_list = array('<', '>');
+        $replace_list = array('&lt;', '&gt;');
         $this->content = str_replace($search_list, $replace_list, $this->plainText);
     }
 
+    function renderElement($n, $c) {
+        $o = new Element($n);
+        $o->content = $c;
+        $t = $o->render();
+        unset($o);
+        return $t;
+    }
+
     function mdFormat() {
-        $search_list = array("/\*(.*?)\*/");
-        $replace_list = array("<em>$1</em>");
+        $search_list = array(
+            '/([A-Z a-z*_]|^)(\*\*|__)(.*?)\2/',              # strong
+            '/([A-Z a-z*_]|^)(\*|_)(.*?)([A-Z a-z*_])\2/',    # em
+            '/\\\(\*|_)/'
+        );
+        $replace_list = array(
+            $this->renderElement('strong', '\3'),
+            '\1'.$this->renderElement('em', '\3\4'),
+            '\1'
+        );
         $this->content = preg_replace($search_list, $replace_list, $this->content);
     }
 
