@@ -3,7 +3,8 @@ class SimpleElement {
     protected
         $options = array();
     public
-        $name;
+        $name,
+        $newline = true;
 
     function __construct ($n = '') {
         $this->name = $n;
@@ -19,7 +20,7 @@ class SimpleElement {
             $opts .= ' '.$o;
             if ($this->options[$o] != NULL) {
                 $opts .= '="'.$this->options[$o].'"';
-            }            
+            }
         }
         return '<'.$this->name.$opts.'>';
     }
@@ -47,7 +48,8 @@ class BlockElement {
 
     function render() {
         $txt = str_replace("\n", "\n".$this->indent, $this->element->render());
-        return $this->indent.$txt."\n";
+        if ($this->element->newline == true) $txt .= "\n";
+        return $this->indent.$txt;
     }
 }
 
@@ -70,10 +72,12 @@ class Block extends Element {
 
     function render() {
         $txt = '';
+        $doIndent = true;
         $e = $this->elements;
         while ($e != NULL) {
-            $e->incIndent();
+            if ($doIndent) $e->incIndent();
             $txt .= $e->render();
+            $e->element->newline == false ? $doIndent = false: $doIndent = true;
             $e = $e->nextElement;
         }
         return SimpleElement::render()."\n".$txt.'</'.$this->name.'>';
@@ -143,6 +147,7 @@ class Image extends SimpleElement {
 class Text {
     public
         $plainText,
+        $newline = true,
         $lineLen = 80;
 
     protected
@@ -184,6 +189,32 @@ class Text {
         $this->prepareContent();
         $this->mdFormat();
         return wordwrap($this->content, $this->lineLen, "\n" );
+    }
+}
+
+class Form extends Block {
+    function __construct($action = NULL, $method = 'post') {
+        $this->name = 'form';
+        if ($action != NULL) $this->setOption('action', $action);
+        if ($method != NULL) $this->setOption('method', $method);
+    }
+
+    function addRadio($group, $value, $desc) {
+        $e = new SimpleElement('input');
+        $e->setOption('type', 'radio');
+        $e->setOption('name', $group);
+        $e->setOption('value', $value);
+        $this->addElement($e);
+        $this->addElement($desc);
+        return $e;
+    }
+
+    function addSubmitButton($value) {
+        $e = new SimpleElement('input');
+        $e->setOption('type', 'submit');
+        $e->setOption('value', $value);
+        $this->addElement($e);
+        return $e;
     }
 }
 ?>
